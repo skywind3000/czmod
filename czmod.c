@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <time.h>
+#include <assert.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #include <windows.h>
@@ -26,8 +27,8 @@
 
 #define IB_STRING_SSO 256
 
-#include "system/iposix.c"
-#include "system/imembase.c"
+#include "system/iposix.h"
+#include "system/imembase.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
