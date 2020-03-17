@@ -29,6 +29,10 @@
 #include "system/iposix.c"
 #include "system/imembase.c"
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
 
 //----------------------------------------------------------------------
 // INLINE
@@ -374,12 +378,70 @@ void z_update(const char *newpath)
 		int i, count = ib_array_size(items);
 		int strsize = (int)strlen(newpath);
 		int found = 0;
+		uint64_t total = 0;
 		for (i = 0; i < count; i++) {
 			PathItem *item = (PathItem*)ib_array_index(items, i);
-			if (item->path.size == strsize) {
-				
+			total += item->rank;
+		}
+		if (total >= 5000) {
+			ib_array *na = ib_array_new((void (*)(void*))item_delete);
+			for (i = 0; i < count; i++) {
+				PathItem *item = (PathItem*)ib_array_index(items, i);
+				item->rank = (item->rank * 9) / 10;
+			}
+			while (ib_array_size(items) > 0) {
+				PathItem *item = (PathItem*)ib_array_pop(items);
+				if (item->rank == 0) {
+					item_delete(item);
+				}	else {
+					ib_array_push(na, item);
+				}
+			}
+			ib_array_delete(items);
+			items = na;
+			ib_array_reverse(items);
+			count = (int)ib_array_size(items);
+		}
+		for (i = 0; i < count; i++) {
+			PathItem *item = (PathItem*)ib_array_index(items, i);
+			if (item->path->size == strsize) {
+				if (memcmp(item->path->ptr, newpath, strsize) == 0) {
+					item->rank += 1;
+					item->timestamp = (uint32_t)time(NULL);
+					found = 1;
+					break;
+				}
 			}
 		}
+		if (found == 0) {
+			PathItem *item = item_new(newpath, 1, (uint32_t)time(NULL));
+			ib_array_push(items, item);
+		}
+	}
+	lseek(fd, 0, SEEK_SET);
+	{
+		int i, count;
+		count = (int)ib_array_size(items);
+		static char text[PATH_MAX + 60];
+		ib_string *content = ib_string_new();
+		int avail, start;
+		for (i = 0; i < count; i++) {
+			PathItem *item = (PathItem*)ib_array_index(items, i);
+			sprintf(text, "%s|%u|%u\n", item->path->ptr, item->rank, item->timestamp);
+			ib_string_append(content, text);
+		}
+		start = 0;
+		avail = content->size;
+		while (avail > 0) {
+			int hr = write(fd, content->ptr + start, avail);
+			if (hr <= 0) {
+				break;
+			}
+			start += hr;
+			avail -= hr;
+		}
+		ftruncate(fd, content->size);
+		ib_string_delete(content);
 	}
 	flock(fd, LOCK_UN);
 	close(fd);
@@ -387,7 +449,7 @@ void z_update(const char *newpath)
 
 
 //---------------------------------------------------------------------
-// 
+// insert with replace
 //---------------------------------------------------------------------
 void z_insert(const char *newpath)
 {
