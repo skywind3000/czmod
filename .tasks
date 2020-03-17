@@ -16,7 +16,7 @@ save=2
 output=terminal
 
 [project-test]
-command=./czmod --test
+command=./czmod -e vim
 cwd=<root>
 save=2
 output=terminal

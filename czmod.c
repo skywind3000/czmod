@@ -144,7 +144,7 @@ typedef struct
 	ib_string *path;
 	int rank;
 	uint32_t timestamp;
-	uint64_t frecence;
+	double frecent;
 }	PathItem;
 
 static void item_delete(PathItem *item)
@@ -165,9 +165,18 @@ PathItem* item_new(const char *path, int rank, uint32_t timestamp)
 	item->path = ib_string_new_from(path);
 	item->rank = rank;
 	item->timestamp = timestamp;
-	item->frecence = 0;
+	item->frecent = rank;
 	return item;
 };
+
+// compare item
+int item_compare(const void *p1, const void *p2)
+{
+	PathItem *n1 = (PathItem*)p1;
+	PathItem *n2 = (PathItem*)p2;
+	if (n1->frecent == n2->frecent) return 0;
+	return (n1->frecent > n2->frecent)? 1 : -1;
+}
 
 ib_array* ib_array_new_items(void)
 {
@@ -322,7 +331,138 @@ void data_add(ib_array *items, const char *path)
 
 
 //---------------------------------------------------------------------
-// 
+// match string
+//---------------------------------------------------------------------
+int string_match(const char *text, int argc, const char *argv[])
+{
+	int enhanced = 1;
+	int pos = 0;
+	int i;
+	if (argc == 0) return 0;
+	for (i = 0; i < argc; i++) {
+		const char *keyword = argv[i];
+		const char *p = strstr(text + pos, keyword);
+		if (p == NULL) {
+			return -1;
+		}
+		pos = (int)(p - text) + ((int)strlen(keyword));
+	}
+	if (enhanced != 0) {
+		const char *keyword = argv[argc - 1];
+		const char *p1 = strrchr(text, '/');
+		const char *p2;
+		if (p1 == NULL) {
+			p1 = strrchr(text, '\\');
+			if (p1 == NULL) {
+				return 0;
+			}
+		}
+		else {
+			p2 = strrchr(text, '\\');
+			if (p2 != NULL) {
+				if (p2 > p1) {
+					p1 = p2;
+				}
+			}
+		}
+		p2 = strstr(p1, keyword);
+		if (p2 == NULL) {
+			return -2;
+		}
+	}
+	return 0;
+}
+
+
+//---------------------------------------------------------------------
+// score path
+//---------------------------------------------------------------------
+void data_score(ib_array *items, int mode)
+{
+	uint32_t current = (uint32_t)time(NULL);
+	int count = (int)ib_array_size(items);
+	int i;
+	for (i = 0; i < count; i++) {
+		PathItem* item = (PathItem*)ib_array_index(items, i);
+		if (mode == 0) {
+			uint32_t ts = current - item->timestamp;
+			if (ts < 3600) {
+				item->frecent = item->rank * 4;
+			}
+			else if (ts < 86400) {
+				item->frecent = item->rank * 2;
+			}
+			else if (ts < 604800) {
+				item->frecent = item->rank * 0.5;
+			}
+			else {
+				item->frecent = item->rank * 0.25;
+			}
+		}
+		else if (mode == 1) {
+			item->frecent = item->rank;
+		}
+		else {
+			uint32_t ts = current - item->timestamp;
+			item->frecent = -((double)ts);
+		}
+	}
+	ib_array_sort(items, item_compare);
+	ib_array_reverse(items);
+}
+
+
+//---------------------------------------------------------------------
+// display data
+//---------------------------------------------------------------------
+void data_print(ib_array *items)
+{
+	int count = (int)ib_array_size(items);
+	int i;
+	for (i = 0; i < count; i++) {
+		PathItem *item = (PathItem*)ib_array_index(items, count - i - 1);
+		printf("%.2f: %s\n", item->frecent, item->path->ptr);
+	}
+}
+
+
+//---------------------------------------------------------------------
+// match
+//---------------------------------------------------------------------
+ib_array* data_match(int argc, const char *argv[])
+{
+	const char *data = get_data_file();
+	ib_array *items = data_load(data);
+	ib_array *result = NULL;
+	if (items == NULL) {
+		return NULL;
+	}
+	result = ib_array_new_items();
+	while (ib_array_size(items)) {
+		PathItem* item = (PathItem*)ib_array_pop(items);
+		int valid = 0;
+		if (argc == 0) {
+			valid = 1;
+		}	else {
+			int hr = string_match(item->path->ptr, argc, argv);
+			if (hr == 0) {
+				valid = 1;
+			}
+		}
+		if (valid) {
+			ib_array_push(result, item);
+		}	else {
+			item_delete(item);
+		}
+	}
+	ib_array_delete(items);
+	data_score(result, 0);
+	return result;
+}
+
+
+//---------------------------------------------------------------------
+// update database
 //---------------------------------------------------------------------
 void z_update(const char *newpath)
 {
@@ -358,7 +498,6 @@ void z_update(const char *newpath)
 			ib_string *line = (ib_string*)ib_array_index(array, i);
 			int p1 = ib_string_find_c(line, '|', 0);
 			int p2 = 0;
-			uint32_t rank, timestamp;
 			if (p1 < 0) {
 				continue;
 			}
@@ -529,9 +668,19 @@ void z_add(const char *newpath)
 
 
 //---------------------------------------------------------------------
+// match and display
+//---------------------------------------------------------------------
+void z_echo(int argc, const char *argv[])
+{
+	ib_array *items = data_match(argc, argv);
+	data_print(items);
+}
+
+
+//---------------------------------------------------------------------
 // main entry
 //---------------------------------------------------------------------
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
 	if (argc <= 1) {
 		int i;
@@ -558,6 +707,9 @@ int main(int argc, char *argv[])
 			z_insert(argv[2]);
 #endif
 		}
+	}
+	else if (strcmp(argv[1], "-e") == 0) {
+		z_echo(argc - 2, argv + 2);
 	}
 	return 0;
 }
