@@ -2,7 +2,7 @@
  
 [z.lua](https://github.com/skywind3000/z.lua) is fast enough for most case, the path tracking action will be triggered each time when you change your current directory.
 
-So I still recommand to use the pure lua script for portability and flexibility, but for someone who really care about `10ms` or `1ms` things, this module can help them to gain the ultimate speed.
+So I still recommend the pure lua script for portability and flexibility, but for someone who really care about `10ms` or `1ms` things, this module can help them to gain the ultimate speed.
 
 
 ## Feature
