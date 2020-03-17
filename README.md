@@ -1,6 +1,8 @@
 # Preface
  
-C module to boost [z.lua](https://github.com/skywind3000/z.lua).
+[z.lua](https://github.com/skywind3000/z.lua) is fast enough for most case, the path tracking action will be triggered each time when your current working directory changes.
+
+So I still recommand to use the pure lua script for portability and flexibility, but for someone who really care about `10ms` or `1ms` things, this module can help them to gain the the ultimate speed.
 
 
 ## Feature
