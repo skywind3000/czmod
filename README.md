@@ -54,7 +54,7 @@ Average performance:
 |-|-|-|
 | **Update Time** | 1.6ms | 7.1ms |
 | **Query Time** | 1.5ms | 5.8ms |
-| **Binary Size** | 0.1 MB | 2.2 MB |
+| **Binary Size** | 102 KB | 2.2 MB |
 
 
 Benchmark with `hyperfine` for updating:
