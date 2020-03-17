@@ -350,6 +350,7 @@ void z_update(const char *newpath)
 			avail -= hr;
 			start += hr;
 		}
+		lseek(fd, 0, SEEK_SET);
 		array = ib_string_split(content, "\n", 1);
 		ib_string_delete(content);
 		for (count = ib_array_size(array), i = 0; i < count; i++) {
@@ -418,7 +419,6 @@ void z_update(const char *newpath)
 			ib_array_push(items, item);
 		}
 	}
-	lseek(fd, 0, SEEK_SET);
 	{
 		int i, count;
 		count = (int)ib_array_size(items);
@@ -534,6 +534,7 @@ int main(int argc, char *argv[])
 {
 	if (argc <= 1) {
 		int i;
+#if 0
 		printf("begin\n");
 		clock_t ts = (uint64_t)clock();
 		for (i = 0; i < 1000; i++) {
@@ -543,6 +544,9 @@ int main(int argc, char *argv[])
 		ts = clock() - ts;
 		ts = (ts * 1000) / CLOCKS_PER_SEC;
 		printf("finished: %d ms\n", (int)ts);
+#else
+		z_update("/tmp");
+#endif
 		return 0;
 	}
 	if (strcmp(argv[1], "--add") == 0) {
