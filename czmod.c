@@ -589,65 +589,6 @@ void z_update(const char *newpath)
 
 
 //---------------------------------------------------------------------
-// insert with replace
-//---------------------------------------------------------------------
-void z_insert(const char *newpath)
-{
-	static char tmpname[PATH_MAX + 10];
-	static char text[PATH_MAX + 100];
-	const char *data = "/home/skywind/.zlua";
-	FILE *fin = fopen(data, "r");
-	FILE *fout;
-#if 0
-	while (1) {
-		char tmp[100];
-		sprintf(tmp, ".%u%03u%d", (uint32_t)time(NULL), 
-				(uint32_t)(clock() % 1000), rand() % 10000);
-		sprintf(tmpname, "%s%s", data, tmp);
-		if (iposix_path_isdir(tmpname) < 0) break;
-	}
-#else
-	sprintf(tmpname, "%s.1", data);
-#endif
-	fout = fopen(tmpname, "w");
-	if (fin) {
-		int found = 0;
-		while (!feof(fin)) {
-			uint32_t rank, ts;
-			text[0] = 0;
-			fgets(text, PATH_MAX + 100, fin);
-			char *p1 = strchr(text, '|');
-			if (p1 == NULL) continue;
-			*p1++ = 0;
-			char *p2 = strchr(p1, '|');
-			if (p2 == NULL) continue;
-			*p2++ = 0;
-			if (strcmp(text, newpath) == 0) {
-				found = 1;
-				sscanf(p1, "%u", &rank);
-				sscanf(p2, "%u", &ts);
-				rank++;
-				ts = (uint32_t)time(NULL);
-				fprintf(fout, "%s|%u|%u\n", text, rank, ts);
-			}
-			else {
-				fprintf(fout, "%s|%s|%s\n", text, p1, p2);
-			}
-		}
-		if (!found) {
-			fprintf(fout, "%s|1|%u\n", newpath, (uint32_t)time(NULL));
-		}
-		fclose(fin);
-	}
-	else {
-		fprintf(fout, "%s|1|%u\n", newpath, (uint32_t)time(NULL));
-	}
-	fclose(fout);
-	rename(tmpname, data);
-}
-
-
-//---------------------------------------------------------------------
 // add to database
 //---------------------------------------------------------------------
 void z_add(const char *newpath)
@@ -673,7 +614,14 @@ void z_add(const char *newpath)
 void z_echo(int argc, const char *argv[])
 {
 	ib_array *items = data_match(argc, argv);
-	data_print(items);
+	if (items == NULL) {
+		return;
+	}
+	if (ib_array_size(items) > 0) {
+		PathItem *item = ib_array_obj(items, PathItem*, 0);
+		printf("%s\n", item->path->ptr);
+	}
+	ib_array_delete(items);
 }
 
 
@@ -683,28 +631,14 @@ void z_echo(int argc, const char *argv[])
 int main(int argc, const char *argv[])
 {
 	if (argc <= 1) {
-		int i;
-#if 0
-		printf("begin\n");
-		clock_t ts = (uint64_t)clock();
-		for (i = 0; i < 1000; i++) {
-			// z_add("/tmp");
-			z_insert("/tmp");
-		}
-		ts = clock() - ts;
-		ts = (ts * 1000) / CLOCKS_PER_SEC;
-		printf("finished: %d ms\n", (int)ts);
-#else
-		z_update("/tmp");
-#endif
 		return 0;
 	}
 	if (strcmp(argv[1], "--add") == 0) {
 		if (argc >= 3) {
-#if 1
+#if 0
 			z_add(argv[2]);
 #else
-			z_insert(argv[2]);
+			z_update(argv[2]);
 #endif
 		}
 	}

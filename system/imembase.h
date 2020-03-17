@@ -461,6 +461,12 @@ void* ib_array_pop_at(ib_array *array, size_t index);
 void ib_array_for_each(ib_array *array, void (*iterator)(void *item));
 void ib_array_reverse(ib_array *array);
 
+#define ib_array_obj(array, type, index) \
+	((type)ib_array_index((array), (index)))
+
+#define ib_array_obj_const(array, type, index) \
+	((type)ib_array_const_index((array), (index)))
+
 void ib_array_sort(ib_array *array, 
 		int (*compare)(const void*, const void*));
 
