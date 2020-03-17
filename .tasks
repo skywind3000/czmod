@@ -1,0 +1,24 @@
+# vim: set fenc=utf-8 ft=dosini:
+[file-build]
+command=musl-gcc -O3 "$(VIM_FILENAME)" -o "$(VIM_FILENOEXT)" -static 
+cwd=$(VIM_FILEDIR)
+save=1
+
+[project-build]
+command=musl-gcc -O3 -o czmod czmod.c system/imembase.c system/iposix.c -static -s
+cwd=<root>
+save=2
+
+[project-run]
+command=./czmod --test
+cwd=<root>
+save=2
+output=terminal
+
+[project-test]
+command=./czmod --test
+cwd=<root>
+save=2
+output=terminal
+
+

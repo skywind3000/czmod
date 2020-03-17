@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+czmod
+czmod.p
+czmod.o
+
+test*.c
+test*.o
+test*
+
+
