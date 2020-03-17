@@ -89,7 +89,7 @@ static const char *get_data_file(void)
 	if (text != NULL) {
 		return text->ptr;
 	}
-	text = os_getenv("_ZL_DATA2");
+	text = os_getenv("_ZL_DATA");
 	if (text) {
 		return text->ptr;
 	}
