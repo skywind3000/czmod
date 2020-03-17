@@ -675,6 +675,20 @@ void* ib_array_pop_at(ib_array *array, size_t index)
 	return item;
 }
 
+void ib_array_reverse(ib_array *array)
+{
+	if (array->size > 0) {
+		void **items = array->items;
+		size_t size = array->size;
+		size_t i, j;
+		for (i = 0, j = size - 1; i < j; i++, j--) {
+			void *tmp = items[i];
+			items[i] = items[j];
+			items[j] = tmp;
+		}
+	}
+}
+
 void ib_array_sort(ib_array *array, 
 		int (*compare)(const void*, const void*))
 {

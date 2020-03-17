@@ -459,6 +459,7 @@ void ib_array_remove(ib_array *array, size_t index);
 void ib_array_insert_before(ib_array *array, size_t index, void *item);
 void* ib_array_pop_at(ib_array *array, size_t index);
 void ib_array_for_each(ib_array *array, void (*iterator)(void *item));
+void ib_array_reverse(ib_array *array);
 
 void ib_array_sort(ib_array *array, 
 		int (*compare)(const void*, const void*));

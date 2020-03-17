@@ -9,22 +9,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <stdint.h>
+#include <limits.h>
 #include <time.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #include <windows.h>
 #elif defined(__linux)
 // #include <linux/limits.h>
-#include <limits.h>
 #include <sys/file.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #endif
 
 #define IB_STRING_SSO 256
 
-#include "iposix.c"
-#include "imembase.c"
+#include "system/iposix.c"
+#include "system/imembase.c"
 
 
 //----------------------------------------------------------------------
@@ -310,6 +313,76 @@ void data_add(ib_array *items, const char *path)
 		ib_array_push(items, ni);
 	}
 	ib_string_delete(target);
+}
+
+
+//---------------------------------------------------------------------
+// 
+//---------------------------------------------------------------------
+void z_update(const char *newpath)
+{
+	const char *data = get_data_file();
+	int fd = open(data, O_CREAT | O_RDWR, 0666);
+	ib_array *items;
+	if (fd < 0) {
+		return;
+	}
+	flock(fd, LOCK_EX);
+	off_t size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	items = ib_array_new_items();
+	if (size > 0) {
+		ib_string *content = ib_string_new();
+		int avail = (int)size;
+		int start = 0;
+		ib_array *array;
+		int i, count;
+		ib_string_resize(content, (int)size);
+		while (avail > 0) {
+			int hr = read(fd, content->ptr + start, avail);
+			if (hr <= 0) {
+				break;
+			}
+			avail -= hr;
+			start += hr;
+		}
+		array = ib_string_split(content, "\n", 1);
+		ib_string_delete(content);
+		for (count = ib_array_size(array), i = 0; i < count; i++) {
+			ib_string *line = (ib_string*)ib_array_index(array, i);
+			int p1 = ib_string_find_c(line, '|', 0);
+			int p2 = 0;
+			uint32_t rank, timestamp;
+			if (p1 < 0) {
+				continue;
+			}
+			p2 = ib_string_find_c(line, '|', p1 + 1);
+			if (p2 >= 0) { 
+				uint32_t timestamp;
+				int rank;
+				line->ptr[p1] = 0;
+				line->ptr[p2] = 0;
+				rank = (int)atoi(line->ptr + p1 + 1);
+				timestamp = (uint32_t)strtoul(line->ptr + p2 + 1, NULL, 10);
+				PathItem *ni = item_new(line->ptr, rank, timestamp);
+				ib_array_push(items, ni);
+			}
+		}
+		ib_array_delete(array);
+	}
+	{
+		int i, count = ib_array_size(items);
+		int strsize = (int)strlen(newpath);
+		int found = 0;
+		for (i = 0; i < count; i++) {
+			PathItem *item = (PathItem*)ib_array_index(items, i);
+			if (item->path.size == strsize) {
+				
+			}
+		}
+	}
+	flock(fd, LOCK_UN);
+	close(fd);
 }
 
 
