@@ -65,11 +65,11 @@ and searching:
 
 ![](https://skywind3000.github.io/images/p/czmod/i-query.png)
 
-benchmark of `z.lua` script (update & search):
+benchmark of `z.lua` and `autojump`:
 
 ![](https://skywind3000.github.io/images/p/czmod/zlua.png)
 
-benchmark of `autojump` script (update & search):
+and:
 
 ![](https://skywind3000.github.io/images/p/czmod/autojump.png)
 
