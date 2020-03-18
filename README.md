@@ -50,11 +50,11 @@ source ~/github/czmod/czmod.zsh
 
 Average performance:
 
-| Name | czmod | zoxide |
-|-|-|-|
-| **Update Time** | 1.6ms | 7.1ms |
-| **Query Time** | 1.5ms | 5.8ms |
-| **Binary Size** | 102 KB | 2.2 MB |
+| Name | czmod | zoxide | z.lua | autojump |
+|-|-|-|-|-|
+| **Update Time** | 1.6ms | 7.1ms | 13.8ms | 83.6ms |
+| **Query Time** | 1.5ms | 5.8ms | 9.8ms | 78.5ms | 
+| **Binary Size** | 102 KB | 2.2 MB | 70 KB | 100 KB |
 
 
 Benchmark with `hyperfine` for updating:
