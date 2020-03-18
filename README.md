@@ -52,8 +52,8 @@ Average performance:
 
 | Name | czmod | zoxide | z.lua | autojump |
 |-|-|-|-|-|
-| **Update Time** | 1.6ms | 7.1ms | 13.8ms | 83.6ms |
-| **Query Time** | 1.5ms | 5.8ms | 9.8ms | 78.5ms | 
+| **Update Time** | 1.6ms | 7.1ms | 13.2ms | 85.2ms |
+| **Query Time** | 1.5ms | 5.8ms | 9.8ms | 79.3ms | 
 | **Binary Size** | 102 KB | 2.2 MB | 70 KB | 100 KB |
 
 
@@ -64,6 +64,15 @@ Benchmark with `hyperfine` for updating:
 and searching:
 
 ![](https://skywind3000.github.io/images/p/czmod/i-query.png)
+
+benchmark of `z.lua` script (update & search):
+
+![](https://skywind3000.github.io/images/p/czmod/zlua.png)
+
+benchmark of `autojump` script (update & search):
+
+![](https://skywind3000.github.io/images/p/czmod/autojump.png)
+
 
 ## Credit
 
