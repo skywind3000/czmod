@@ -8,8 +8,6 @@ So I still recommend the pure lua script for portability and flexibility, but fo
 ## Feature
 
 - Speed up `z.lua` for history tracking and matching.
-- **20 times** smaller than `zoxide` in binary size.
-- **4-5 times** faster than the rust project `zoxide`.
 - Easy to install.
 
 ## Install
@@ -50,28 +48,11 @@ source ~/github/czmod/czmod.zsh
 
 Average performance:
 
-| Name | czmod | zoxide | z.lua | autojump |
+| Name | czmod |  z.lua |
 |-|-|-|-|-|
-| **Update Time** | 1.6ms | 7.1ms | 13.2ms | 85.2ms |
-| **Query Time** | 1.5ms | 5.8ms | 9.8ms | 79.3ms | 
-| **Binary Size** | 102 KB | 2.2 MB | 70 KB | 100 KB |
+| **Update Time** | 1.6ms | 13.2ms |
+| **Query Time** | 1.5ms | 9.8ms |
 
-
-Benchmark with `hyperfine` for updating:
-
-![](https://skywind3000.github.io/images/p/czmod/i-add.png)
-
-and searching:
-
-![](https://skywind3000.github.io/images/p/czmod/i-query.png)
-
-benchmark of `z.lua` and `autojump`:
-
-![](https://skywind3000.github.io/images/p/czmod/zlua.png)
-
-and:
-
-![](https://skywind3000.github.io/images/p/czmod/autojump.png)
 
 
 ## Credit
