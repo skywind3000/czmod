@@ -49,7 +49,7 @@ source ~/github/czmod/czmod.zsh
 Average performance:
 
 | Name | czmod |  z.lua |
-|-|-|-|-|-|
+|-|-|-|
 | **Update Time** | 1.6ms | 13.2ms |
 | **Query Time** | 1.5ms | 9.8ms |
 
