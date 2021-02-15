@@ -1,13 +1,13 @@
 # Preface
  
-[z.lua](https://github.com/skywind3000/z.lua) is fast enough for most case, the path tracking action will be triggered each time when you change your current directory.
+[z.lua](https://github.com/skywind3000/z.lua) is fast enough for most cases, the path tracking action will be triggered each time when you change your current directory.
 
-So I still recommend the pure lua script for portability and flexibility, but for someone who really care about `10ms` or `1ms` things, this module can help them to gain the ultimate speed.
+So I still recommend the pure lua script for portability and flexibility, but for someone who really cares about very high performance, this module can be helpful.
 
 
-## Feature
+## Features
 
-- Speed up `z.lua` for history tracking and matching.
+- Speeds up `z.lua` for history tracking and matching.
 - Easy to install.
 
 ## Install
@@ -26,7 +26,7 @@ cd ~/github/czmod
 sh build.sh
 ```
 
-### Enable the czmod
+### Enable Czmod
 
 `czmod` must be initialized after `z.lua`:
 
@@ -52,8 +52,6 @@ Average performance:
 |-|-|-|
 | **Update Time** | 1.6ms | 13.2ms |
 | **Query Time** | 1.5ms | 9.8ms |
-
-
 
 ## Credit
 
