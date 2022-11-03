@@ -1,10 +1,10 @@
 #! /usr/bin/bash
 
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 ; pwd -P )"
 CZMODPATH="$SCRIPTPATH/czmod"
 
 if [ ! -x "$CZMODPATH" ]; then
-	SCRIPTPATH="$(readlink """$0""")"
+	SCRIPTPATH="$(readlink """${BASH_SOURCE[0]}""")"
 	SCRIPTPATH="$( cd "$(dirname "$SCRIPTPATH")" >/dev/null 2>&1 ; pwd -P )"
 	CZMODPATH="$SCRIPTPATH/czmod"
 fi
